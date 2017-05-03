@@ -33,7 +33,7 @@ class AutoTranscript (object):
         driver = self.driver
 
         driver.get('https://docs.google.com')
-        new_doc = driver.find_element_by_class_name('docs-homescreen-templates-templateview')
+        new_doc = driver.find_element_by_id(':1d')
         new_doc.click()
         doc_title = driver.find_element_by_class_name('docs-title-input')
         doc_title.send_keys(file_name)
@@ -47,12 +47,47 @@ class AutoTranscript (object):
 
         record_botton = driver.find_element_by_class_name('docs-mic-control')
         record_botton.click()
-        try:
-            recording = driver.find_element_by_class_name('docs-mic-control-recording')
-        except Exception:
-            pass
-        if not recording:
-            record_botton.click()
+        flag = 0
+
+        while True:
+            recording = None
+            hearing = None
+            
+
+            try:
+                recording = driver.find_element_by_class_name('docs-mic-control-recording')
+                hearing = driver.find_element_by_class_name('docs-mic-control-hearing')
+            except Exception:
+                pass
+
+            if hearing == None and recording == None:
+                # It's not hearing nor recording
+                print "All off"
+                flag = 100
+            elif hearing == None:
+                # It's not hearing but recording
+                print "Not hearing"
+                flag += 1
+                print flag
+            else:
+                # It's hearing and recording
+                print "All Good"
+                flag = 0
+                
+            
+            if flag >= 7:
+                record_botton.click()
+                print 'Restarting All'
+                flag = 0
+                
+            elif flag == 6:
+                record_botton.click()
+                record_botton.click()
+                flag = 0
+                print 'Restarting Hearing'
+
+            time.sleep(0.5)
+        
 
 
 
